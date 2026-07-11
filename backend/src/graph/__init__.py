@@ -1,0 +1,1 @@
+"""LangGraph-ready workflow contracts."""

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Threat Intelligent Analyst</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}?v=chat-scroll-v2">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="chat-card" aria-labelledby="page-title">
+        <header class="app-header">
+          <div>
+            <p class="eyebrow">SOC INTELLIGENCE WORKSPACE</p>
+            <h1 id="page-title">Threat Intelligent Analyst</h1>
+            <p class="subtitle">Evidence-oriented analysis powered by correlated live threat-intelligence providers.</p>
+          </div>
+          <span class="mode-badge">{{ mode }} mode</span>
+        </header>
+        <div id="response-container" class="conversation" aria-live="polite">
+          <p class="empty-state">Ask about an IOC, actor, exposure, or infrastructure relationship.</p>
+        </div>
+        <section class="demo-queries" aria-label="Demo queries">
+          <p class="eyebrow">DEMO QUERIES</p>
+          <div class="suggestion-list">
+            <button type="button" data-prompt="Is 45.83.122.10 malicious?">IP reputation</button>
+            <button type="button" data-prompt="What TTPs is APT29 known for?">APT29 TTPs</button>
+            <button type="button" data-prompt="We run Confluence 7.13. Are we exposed?">Confluence exposure</button>
+            <button type="button" data-prompt="Pivot from that IP to related domains.">Pivot domains</button>
+            <button type="button" data-prompt="and what's its ASN?">ASN follow-up</button>
+            <button type="button" data-prompt="Check evil-example.com">Unsafe retrieved text</button>
+            <button type="button" data-prompt="Is 192.0.2.1 malicious?">Reserved test IP handling</button>
+          </div>
+        </section>
+        <form class="chat-form" hx-post="/chat" hx-target="#response-container" hx-swap="beforeend" hx-on::after-request="if(event.detail.successful) this.reset()">
+          <label class="sr-only" for="message">Threat intelligence question</label>
+          <textarea id="message" name="message" required rows="3" placeholder="e.g. Investigate 45.83.122.10"></textarea>
+          <button type="submit">Analyze</button>
+        </form>
+      </section>
+      <section class="side-rail" aria-label="Analyst workflow details">
+        <aside id="context-panel" class="context-card" aria-label="Current context">{% include "partials/context_panel.html" %}</aside>
+        <aside id="trace-panel" class="trace-card" aria-label="Workflow trace">{% include "partials/trace_panel.html" %}</aside>
+      </section>
+    </main>
+    <script>
+      document.querySelectorAll("[data-prompt]").forEach((button) => button.addEventListener("click", () => {
+        document.getElementById("message").value = button.dataset.prompt;
+        document.getElementById("message").focus();
+      }));
+
+      const conversation = document.getElementById("response-container");
+      document.body.addEventListener("htmx:beforeRequest", (event) => {
+        if (event.detail.elt.matches(".chat-form")) {
+          conversation.scrollTo({ top: conversation.scrollHeight, behavior: "smooth" });
+        }
+      });
+      document.body.addEventListener("htmx:afterSwap", (event) => {
+        if (event.detail.target === conversation) {
+          conversation.scrollTo({ top: conversation.scrollHeight, behavior: "smooth" });
+        }
+      });
+    </script>
+  </body>
+</html>

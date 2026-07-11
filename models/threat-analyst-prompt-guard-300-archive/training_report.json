@@ -1,0 +1,120 @@
+{
+  "base_model": "meta-llama/Llama-Prompt-Guard-2-86M",
+  "method": "classification head + final encoder layer",
+  "seed": 20260711,
+  "epochs": 3,
+  "batch_size": 8,
+  "max_length": 64,
+  "trainable_parameters": 7680002,
+  "total_parameters": 278810882,
+  "elapsed_seconds": 379.21,
+  "baseline": {
+    "validation": {
+      "accuracy": 0.6667,
+      "precision": 0.9,
+      "recall": 0.3913,
+      "f1": 0.5455,
+      "false_positive_rate": 0.0455,
+      "false_negative_rate": 0.6087,
+      "true_positive": 9,
+      "true_negative": 21,
+      "false_positive": 1,
+      "false_negative": 14,
+      "examples": 45
+    },
+    "test": {
+      "accuracy": 0.6667,
+      "precision": 0.8889,
+      "recall": 0.3636,
+      "f1": 0.5161,
+      "false_positive_rate": 0.0435,
+      "false_negative_rate": 0.6364,
+      "true_positive": 8,
+      "true_negative": 22,
+      "false_positive": 1,
+      "false_negative": 14,
+      "examples": 45
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 0.332789,
+      "validation": {
+        "accuracy": 0.7111,
+        "precision": 0.8125,
+        "recall": 0.5652,
+        "f1": 0.6667,
+        "false_positive_rate": 0.1364,
+        "false_negative_rate": 0.4348,
+        "true_positive": 13,
+        "true_negative": 19,
+        "false_positive": 3,
+        "false_negative": 10,
+        "examples": 45
+      }
+    },
+    {
+      "epoch": 2,
+      "loss": 0.247429,
+      "validation": {
+        "accuracy": 0.7333,
+        "precision": 0.6774,
+        "recall": 0.913,
+        "f1": 0.7778,
+        "false_positive_rate": 0.4545,
+        "false_negative_rate": 0.087,
+        "true_positive": 21,
+        "true_negative": 12,
+        "false_positive": 10,
+        "false_negative": 2,
+        "examples": 45
+      }
+    },
+    {
+      "epoch": 3,
+      "loss": 0.189104,
+      "validation": {
+        "accuracy": 0.6444,
+        "precision": 0.5897,
+        "recall": 1.0,
+        "f1": 0.7419,
+        "false_positive_rate": 0.7273,
+        "false_negative_rate": 0.0,
+        "true_positive": 23,
+        "true_negative": 6,
+        "false_positive": 16,
+        "false_negative": 0,
+        "examples": 45
+      }
+    }
+  ],
+  "fine_tuned": {
+    "validation": {
+      "accuracy": 0.7333,
+      "precision": 0.6774,
+      "recall": 0.913,
+      "f1": 0.7778,
+      "false_positive_rate": 0.4545,
+      "false_negative_rate": 0.087,
+      "true_positive": 21,
+      "true_negative": 12,
+      "false_positive": 10,
+      "false_negative": 2,
+      "examples": 45
+    },
+    "test": {
+      "accuracy": 0.6,
+      "precision": 0.6,
+      "recall": 0.5455,
+      "f1": 0.5714,
+      "false_positive_rate": 0.3478,
+      "false_negative_rate": 0.4545,
+      "true_positive": 12,
+      "true_negative": 15,
+      "false_positive": 8,
+      "false_negative": 10,
+      "examples": 45
+    }
+  }
+}

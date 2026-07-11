@@ -1,0 +1,25 @@
+<article class="message assistant-message">
+  {% if user_message %}<p class="message-context">Request received: {{ user_message }}</p>{% endif %}
+  {% if summary %}
+  <section class="investigation-summary" aria-label="Investigation summary">
+    <header class="summary-header">
+      <div>
+        <p class="eyebrow">INVESTIGATION SUMMARY</p>
+        <h2>{{ summary.entity }}</h2>
+      </div>
+      <span class="verdict-pill {{ summary.tone }}">{{ summary.verdict }}</span>
+    </header>
+    <dl class="summary-grid">
+      <div><dt>entity type</dt><dd>{{ summary.entity_type }}</dd></div>
+      <div><dt>evidence confidence</dt><dd>{{ summary.confidence }}</dd></div>
+      <div><dt>{{ summary.risk_label }}</dt><dd>{{ summary.risk_score if summary.risk_score is not none else "not available" }}</dd></div>
+      <div><dt>source coverage</dt><dd>{{ summary.source_coverage }}</dd></div>
+    </dl>
+    <p class="provider-status"><span>provider status</span>{{ summary.provider_status }}</p>
+    {% if summary.related_entities %}
+    <div class="related-entities"><span>related entities</span>{% for entity in summary.related_entities %}<span class="entity-chip">{{ entity }}</span>{% endfor %}</div>
+    {% endif %}
+  </section>
+  {% endif %}
+  <div class="assistant-response">{{ message }}</div>
+</article>

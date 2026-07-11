@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage.xml
+htmlcov/
+
+# Environments and local configuration
+.venv/
+venv/
+env/
+.env
+.git-inherited-history/
+
+# Logs and local files
+*.log
+logs/
+*.sqlite3
+.DS_Store
+Thumbs.db
+
+# Local fine-tuned checkpoints are reproducible but too large for normal Git.
+models/**/*.safetensors

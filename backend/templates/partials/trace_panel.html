@@ -1,0 +1,33 @@
+{% if oob %}<aside id="trace-panel" class="trace-card" hx-swap-oob="innerHTML">{% endif %}
+  <h2>Agent execution</h2>
+  <p class="panel-description">Operational telemetry for this investigation.</p>
+  <dl class="trace-list trace-summary">
+    <div><dt>request ID</dt><dd>{{ trace.trace_id if trace else "not started" }}</dd></div>
+    <div><dt>latency</dt><dd>{{ trace.total_latency_ms if trace else 0 }} ms</dd></div>
+    <div><dt>route</dt><dd>{{ trace.intent if trace else "awaiting query" }} to {{ trace.selected_agent if trace else "not selected" }}</dd></div>
+    <div><dt>tools / evidence</dt><dd>{{ trace.tools_called if trace else [] }} / {{ trace.evidence_count if trace else 0 }} claims / {{ trace.source_count if trace else 0 }} sources</dd></div>
+    <div><dt>status</dt><dd>{{ "degraded" if trace and trace.degraded else "completed" }}</dd></div>
+  </dl>
+  <details class="trace-details">
+    <summary>Show detailed execution trace</summary>
+    <dl class="trace-list">
+      <div><dt>timestamp</dt><dd>{{ trace.timestamp if trace and trace.timestamp else "not started" }}</dd></div>
+      <div><dt>workflow nodes</dt><dd>{{ trace.workflow_nodes_executed if trace else [] }}</dd></div>
+      <div><dt>delegated task ID</dt><dd>{{ trace.delegated_task_id if trace and trace.delegated_task_id else "not delegated" }}</dd></div>
+      <div><dt>entity</dt><dd>{{ trace.entity_type if trace and trace.entity_type else "unknown" }} / {{ trace.entity_value if trace and trace.entity_value else "not detected" }}</dd></div>
+      <div><dt>product / version</dt><dd>{{ trace.product if trace and trace.product else "-" }} / {{ trace.version if trace and trace.version else "-" }}</dd></div>
+      <div><dt>memory resolution</dt><dd>resolved={{ trace.resolved_from_memory if trace else false }}; method={{ trace.context_resolver_used if trace else "not needed" }}; context={{ trace.context_used if trace else {} }}</dd></div>
+      <div><dt>confidence factors</dt><dd>{{ trace.confidence_factors if trace else {} }}</dd></div>
+      <div><dt>contradictions</dt><dd>{{ trace.confidence_contradictions if trace else [] }}</dd></div>
+      <div><dt>provider errors</dt><dd>{{ trace.provider_errors if trace else [] }}</dd></div>
+      <div><dt>safety flags</dt><dd>{{ trace.safety_flags if trace else [] }}</dd></div>
+      <div><dt>routing</dt><dd>mode={{ trace.router_mode if trace else "hybrid" }}; used={{ trace.router_used if trace else "not routed" }}; LLM={{ trace.router_llm_status if trace else "not run" }}</dd></div>
+      <div><dt>coreference / planning</dt><dd>coreference={{ trace.coreference_llm_status if trace else "not needed" }}; planner={{ trace.planner_used if trace else "not used" }} / {{ trace.planner_llm_status if trace else "not needed" }}</dd></div>
+      <div><dt>response composition</dt><dd>{{ trace.response_composer_used if trace else "not run" }} / {{ trace.response_composer_llm_status if trace else "not run" }}</dd></div>
+      <div><dt>LLM calls / tool calls</dt><dd>{{ trace.llm_calls_made if trace else 0 }} / {{ trace.tool_calls_made if trace else 0 }}</dd></div>
+      <div><dt>semantic guard</dt><dd>called={{ trace.semantic_guard_called if trace else false }}; risk={{ trace.semantic_guard_risk if trace else "not run" }}; confidence={{ trace.semantic_guard_confidence if trace and trace.semantic_guard_confidence is not none else "none" }}</dd></div>
+      <div><dt>LLM / guard errors</dt><dd>LLM={{ trace.llm_error if trace and trace.llm_error else "none" }}; guard={{ trace.semantic_guard_error if trace and trace.semantic_guard_error else "none" }}</dd></div>
+      <div><dt>next action</dt><dd>{{ trace.next_action if trace else "Await analyst query." }}</dd></div>
+    </dl>
+  </details>
+{% if oob %}</aside>{% endif %}

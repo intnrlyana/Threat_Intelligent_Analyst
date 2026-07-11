@@ -1,0 +1,120 @@
+{
+  "base_model": "meta-llama/Llama-Prompt-Guard-2-86M",
+  "method": "classification head + final 1 encoder layer(s)",
+  "seed": 20260711,
+  "epochs": 3,
+  "batch_size": 8,
+  "max_length": 64,
+  "trainable_parameters": 7680002,
+  "total_parameters": 278810882,
+  "elapsed_seconds": 758.98,
+  "baseline": {
+    "validation": {
+      "accuracy": 0.6667,
+      "precision": 0.9412,
+      "recall": 0.3556,
+      "f1": 0.5161,
+      "false_positive_rate": 0.0222,
+      "false_negative_rate": 0.6444,
+      "true_positive": 32,
+      "true_negative": 88,
+      "false_positive": 2,
+      "false_negative": 58,
+      "examples": 180
+    },
+    "test": {
+      "accuracy": 0.6556,
+      "precision": 0.8043,
+      "recall": 0.4111,
+      "f1": 0.5441,
+      "false_positive_rate": 0.1,
+      "false_negative_rate": 0.5889,
+      "true_positive": 37,
+      "true_negative": 81,
+      "false_positive": 9,
+      "false_negative": 53,
+      "examples": 180
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 0.223547,
+      "validation": {
+        "accuracy": 0.6278,
+        "precision": 0.5793,
+        "recall": 0.9333,
+        "f1": 0.7149,
+        "false_positive_rate": 0.6778,
+        "false_negative_rate": 0.0667,
+        "true_positive": 84,
+        "true_negative": 29,
+        "false_positive": 61,
+        "false_negative": 6,
+        "examples": 180
+      }
+    },
+    {
+      "epoch": 2,
+      "loss": 0.186523,
+      "validation": {
+        "accuracy": 0.7167,
+        "precision": 0.6667,
+        "recall": 0.8667,
+        "f1": 0.7536,
+        "false_positive_rate": 0.4333,
+        "false_negative_rate": 0.1333,
+        "true_positive": 78,
+        "true_negative": 51,
+        "false_positive": 39,
+        "false_negative": 12,
+        "examples": 180
+      }
+    },
+    {
+      "epoch": 3,
+      "loss": 0.133856,
+      "validation": {
+        "accuracy": 0.75,
+        "precision": 0.6891,
+        "recall": 0.9111,
+        "f1": 0.7847,
+        "false_positive_rate": 0.4111,
+        "false_negative_rate": 0.0889,
+        "true_positive": 82,
+        "true_negative": 53,
+        "false_positive": 37,
+        "false_negative": 8,
+        "examples": 180
+      }
+    }
+  ],
+  "fine_tuned": {
+    "validation": {
+      "accuracy": 0.75,
+      "precision": 0.6891,
+      "recall": 0.9111,
+      "f1": 0.7847,
+      "false_positive_rate": 0.4111,
+      "false_negative_rate": 0.0889,
+      "true_positive": 82,
+      "true_negative": 53,
+      "false_positive": 37,
+      "false_negative": 8,
+      "examples": 180
+    },
+    "test": {
+      "accuracy": 0.65,
+      "precision": 0.6116,
+      "recall": 0.8222,
+      "f1": 0.7014,
+      "false_positive_rate": 0.5222,
+      "false_negative_rate": 0.1778,
+      "true_positive": 74,
+      "true_negative": 43,
+      "false_positive": 47,
+      "false_negative": 16,
+      "examples": 180
+    }
+  }
+}

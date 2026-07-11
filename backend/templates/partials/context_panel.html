@@ -1,0 +1,10 @@
+{% if oob %}<aside id="context-panel" class="context-card" hx-swap-oob="innerHTML">{% endif %}
+  <h2>Current context</h2>
+  <dl class="trace-list compact-list">
+    <div><dt>last_ip</dt><dd>{{ memory.last_ip if memory and memory.last_ip else "none" }}</dd></div>
+    <div><dt>last_domain</dt><dd>{{ memory.last_domain if memory and memory.last_domain else "none" }}</dd></div>
+    <div><dt>last_actor</dt><dd>{{ memory.last_actor if memory and memory.last_actor else "none" }}</dd></div>
+    <div><dt>last_product</dt><dd>{{ memory.last_product if memory and memory.last_product else "none" }}</dd></div>
+    <div><dt>last_asn</dt><dd>{{ memory.last_asn if memory and memory.last_asn else "none" }}</dd></div>
+  </dl>
+{% if oob %}</aside>{% endif %}

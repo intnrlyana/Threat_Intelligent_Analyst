@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+jinja2
+python-dotenv
+pydantic
+langgraph
+langchain-core
+langchain-groq
+pytest
+httpx
+python-multipart
+transformers
+torch
+mcp>=1.27,<2
