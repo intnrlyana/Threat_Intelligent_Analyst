@@ -18,7 +18,7 @@ The application supports IP addresses, domains, MD5/SHA-1/SHA-256 hashes, produc
 
 ## Why this architecture
 
-![Threat Intelligent Analyst architecture flowchart](docs/assets/threat-intelligent-analyst-architecture.png)
+![Threat Intelligent Analyst architecture flowchart](docs/assets/architectue-flowchart.png)
 
 The design is intentionally hybrid:
 
