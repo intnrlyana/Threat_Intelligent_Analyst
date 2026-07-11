@@ -18,18 +18,7 @@ The application supports IP addresses, domains, MD5/SHA-1/SHA-256 hashes, produc
 
 ## Why this architecture
 
-```text
-Analyst chat (FastAPI / Jinja2 / HTMX)       MCP client
-                    |                            |
-                    +-------- typed intelligence core --------+
-                                             |
-                                         LangGraph
-  input guard -> semantic guard -> hybrid router -> context resolution
-  -> coordinator -> specialist/tool allowlist -> evidence ledger
-  -> confidence -> grounded response -> memory and trace
-                                             |
-          VirusTotal | AbuseIPDB | AlienVault OTX | NVD | MITRE ATT&CK
-```
+![Threat Intelligent Analyst architecture flowchart](docs/assets/threat-intelligent-analyst-architecture.png)
 
 The design is intentionally hybrid:
 
