@@ -39,7 +39,7 @@ Supported entities include IPv4 addresses, domains, MD5/SHA-1/SHA-256 hashes, ac
 
 ## Architecture
 
-![Threat Intelligent Analyst architecture](docs/assets/architectue-flowchart.png)
+![Threat Intelligent Analyst architecture](docs/assets/architectue-flowchart-simple.png)
 
 ### Request lifecycle
 
