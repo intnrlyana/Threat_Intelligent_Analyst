@@ -14,7 +14,7 @@ def test_default_settings_use_multi_provider(monkeypatch) -> None:
     assert settings.data_mode == "multi_provider"
     assert settings.virustotal_api_key == ""
     assert settings.llm_provider == "groq"
-    assert settings.router_mode == "hybrid"
+    assert settings.router_mode == "semantic"
     assert settings.response_mode == "llm"
     assert settings.groq_api_key == ""
     assert settings.llm_model == "llama-3.1-8b-instant"

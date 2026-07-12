@@ -1,6 +1,5 @@
 from backend.src.config import get_settings
 from backend.src.graph.workflow import run_agent_workflow
-from backend.src.graph.state import AgentMemory
 from backend.src.llm.groq_provider import GroqLLMProvider
 
 
@@ -48,28 +47,19 @@ def test_ambiguous_query_uses_mocked_groq_router(monkeypatch) -> None:
     assert state.trace.llm_called is True
 
 
-def test_llm_response_composer_uses_mocked_grounded_plan(monkeypatch) -> None:
+def test_llm_response_composer_uses_mocked_evidence_bound_analysis(monkeypatch) -> None:
     _configure_groq(monkeypatch, router_mode="rule_based", response_mode="llm")
     monkeypatch.setattr(GroqLLMProvider, "invoke_structured", lambda self, prompt, schema: {
-        "finding": "The available provider evidence assesses 45.83.122.10 as malicious.",
-        "limitations": ["External reputation does not prove internal compromise."],
-        "recommended_next_step": "Review internal telemetry for 45.83.122.10.",
+        "analysis": [{"text": "The result warrants correlation with internal telemetry.", "evidence_ids": ["EV-001"], "certainty": "supported"}],
+        "action_ids": ["IOC-DE-01", "IOC-RS-01", "IOC-PR-01"],
+        "limitation_ids": ["IOC-LIM-TIME", "IOC-LIM-COMPROMISE"],
     })
     state = run_agent_workflow("Is 45.83.122.10 malicious?")
 
     assert state.trace is not None
     assert state.trace.response_composer_used == "groq"
-    assert "Finding" in state.response and "Sources" in state.response
+    assert "Finding" in state.response and "NIST CSF-Aligned Actions" in state.response
     assert "The indicator was detected." in state.response
-
-
-def test_semantic_coreference_selects_only_existing_memory(monkeypatch) -> None:
-    _configure_groq(monkeypatch, router_mode="rule_based", response_mode="deterministic")
-    monkeypatch.setattr(GroqLLMProvider, "invoke_structured", lambda self, prompt, schema: {"selected_memory_key": "last_ip", "confidence": 0.91})
-    state = run_agent_workflow("Pivot further from the infrastructure we investigated.", AgentMemory(last_ip="45.83.122.10"))
-    assert state.entity_value == "45.83.122.10"
-    assert state.resolved_from_memory is True
-    assert state.context_resolver_used == "groq"
 
 
 def test_compound_query_uses_validated_multi_tool_plan(monkeypatch) -> None:
@@ -122,9 +112,9 @@ def test_grounded_composer_rejects_unsupported_qualitative_claim(monkeypatch) ->
 def test_grounded_composer_allows_normal_explanatory_language(monkeypatch) -> None:
     _configure_groq(monkeypatch, router_mode="rule_based", response_mode="llm")
     monkeypatch.setattr(GroqLLMProvider, "invoke_structured", lambda self, prompt, schema: {
-        "finding": "The available provider evidence supports further review, including vulnerability context where relevant.",
-        "limitations": ["External evidence may change over time."],
-        "recommended_next_step": "Review relevant internal telemetry.",
+        "analysis": [{"text": "The available evidence supports further review.", "evidence_ids": ["EV-001"], "certainty": "supported"}],
+        "action_ids": ["IOC-DE-01"],
+        "limitation_ids": ["IOC-LIM-TIME"],
     })
     state = run_agent_workflow("Is 45.83.122.10 malicious?")
     assert state.response_composer_used == "groq"

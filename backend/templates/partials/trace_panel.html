@@ -22,7 +22,7 @@
       <div><dt>provider errors</dt><dd>{{ trace.provider_errors if trace else [] }}</dd></div>
       <div><dt>safety flags</dt><dd>{{ trace.safety_flags if trace else [] }}</dd></div>
       <div><dt>routing</dt><dd>mode={{ trace.router_mode if trace else "hybrid" }}; used={{ trace.router_used if trace else "not routed" }}; LLM={{ trace.router_llm_status if trace else "not run" }}</dd></div>
-      <div><dt>coreference / planning</dt><dd>coreference={{ trace.coreference_llm_status if trace else "not needed" }}; planner={{ trace.planner_used if trace else "not used" }} / {{ trace.planner_llm_status if trace else "not needed" }}</dd></div>
+      <div><dt>planning</dt><dd>{{ trace.planner_used if trace else "not used" }} / {{ trace.planner_llm_status if trace else "not needed" }}</dd></div>
       <div><dt>response composition</dt><dd>{{ trace.response_composer_used if trace else "not run" }} / {{ trace.response_composer_llm_status if trace else "not run" }}</dd></div>
       <div><dt>LLM calls / tool calls</dt><dd>{{ trace.llm_calls_made if trace else 0 }} / {{ trace.tool_calls_made if trace else 0 }}</dd></div>
       <div><dt>semantic guard</dt><dd>called={{ trace.semantic_guard_called if trace else false }}; risk={{ trace.semantic_guard_risk if trace else "not run" }}; confidence={{ trace.semantic_guard_confidence if trace and trace.semantic_guard_confidence is not none else "none" }}</dd></div>

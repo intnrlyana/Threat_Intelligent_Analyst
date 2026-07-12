@@ -10,12 +10,13 @@ from langgraph.graph import END, START, StateGraph
 from backend.src.agent_harness.context import ContextResolution, resolve_context, update_memory
 from backend.src.agent_harness.execution import execute_task, next_action_for
 from backend.src.agent_harness.schemas import EntityType, Intent, RoutingDecision
-from backend.src.agents.coordinator import create_agent_task, is_high_confidence_rule_decision, route_message, select_specialist
+from backend.src.agents.coordinator import create_agent_task, extract_entities, is_high_confidence_rule_decision, route_message, select_specialist
+from backend.src.agents.semantic_router import COMPATIBLE_ENTITY_TYPES, route_semantically
 from backend.src.config import get_settings
 from backend.src.evidence.confidence import score_confidence
 from backend.src.evidence.response_builder import build_response
 from backend.src.graph.state import AgentMemory, AgentState, ToolTrace
-from backend.src.llm.service import classify_with_groq, compose_with_groq, plan_with_groq, resolve_coreference_with_groq
+from backend.src.llm.service import classify_with_groq, compose_with_groq, plan_with_groq
 from backend.src.observability.trace import NodeTrace
 from backend.src.security.input_guard import detect_direct_prompt_injection, validate_input
 from backend.src.security.prompt_guard import classify_with_prompt_guard
@@ -25,6 +26,21 @@ INJECTION_REFUSAL = (
     "I can help with threat intelligence analysis, but I cannot follow instructions that "
     "attempt to override system rules or expose internal prompts."
 )
+
+
+def _fixed_report(finding: str, limitation: str, next_step: str) -> str:
+    """Render non-investigation outcomes with the same stable report contract."""
+    return "\n\n".join([
+        f"Finding\n{finding}",
+        "Evidence\n- No investigation evidence was collected.",
+        "Impact / Risk\nNo evidence-based operational impact can be assessed for this request.",
+        "NIST CSF-Aligned Actions\n"
+        f"- Detect: {next_step}\n"
+        "- Respond: Do not initiate containment without corroborating evidence.\n"
+        "- Protect: Maintain existing controls while the request is clarified.",
+        "Sources\n- No source records were returned.",
+        f"Limitations\n- {limitation}",
+    ])
 
 
 class WorkflowGraphState(TypedDict):
@@ -53,12 +69,14 @@ def _decision_from_state(state: AgentState) -> RoutingDecision:
 
 def _missing_context_response(intent: Intent) -> str:
     if intent == Intent.PIVOT:
-        return "I understood this as a pivot request, but I could not resolve which IP or domain you are referring to. Please provide an indicator such as an IP address or domain."
-    return "I understood this as an ASN lookup, but I could not resolve which IP you are referring to. Please provide an IP address."
+        return _fixed_report("The pivot target could not be resolved.", "No IP address or domain was available for the pivot.", "Please provide an indicator such as an IP address or domain.")
+    if intent == Intent.EXPOSURE_REASONING:
+        return _fixed_report("The software product could not be resolved for this version.", "A version alone is insufficient for exposure assessment.", "Provide the product and version, such as Confluence 7.13.")
+    return _fixed_report("The ASN lookup target could not be resolved.", "No IP address was available for enrichment.", "Provide the IP address to enrich.")
 
 
 def _unknown_response() -> str:
-    return "I could not confidently classify this request into IOC lookup, Actor/TTP, Exposure Reasoning, Pivoting, or ASN lookup. Please provide a threat indicator, actor name, software version, or pivot target."
+    return _fixed_report("The request could not be classified into a supported investigation.", "The request did not contain enough supported threat-intelligence context.", "Provide a threat indicator, actor name, software version, or pivot target.")
 
 
 def _refresh_trace(state: AgentState) -> None:
@@ -97,7 +115,6 @@ def _refresh_trace(state: AgentState) -> None:
         router_used=state.router_used,
         llm_called=state.llm_called,
         router_llm_status=state.router_llm_status,
-        coreference_llm_status=state.coreference_llm_status,
         planner_llm_status=state.planner_llm_status,
         response_composer_llm_status=state.response_composer_llm_status,
         llm_calls_made=state.llm_calls_made,
@@ -171,11 +188,65 @@ def _reserve_llm_call(state: AgentState, purpose: str) -> bool:
     return True
 
 
+def _validated_groq_route(decision: RoutingDecision, entity: RoutingDecision) -> RoutingDecision:
+    """Overlay deterministic entities and reject incompatible Groq intents."""
+    if entity.entity_type != EntityType.UNKNOWN:
+        decision = decision.model_copy(update={
+            "entity_type": entity.entity_type,
+            "entity_value": entity.entity_value,
+            "product": entity.product,
+            "version": entity.version,
+        })
+    if decision.entity_type not in COMPATIBLE_ENTITY_TYPES.get(decision.intent, set()):
+        return RoutingDecision(intent=Intent.UNKNOWN, rationale_summary="Groq intent was incompatible with the extracted entity type.")
+    return decision
+
+
 def _route_intent(state: AgentState) -> None:
     settings = get_settings()
+    router_mode = settings.router_mode.lower()
+    if router_mode == "semantic":
+        entity = extract_entities(state.message)
+        decision = RoutingDecision(intent=Intent.UNKNOWN)
+        try:
+            semantic = route_semantically(state.message, entity, settings)
+            if semantic.accepted:
+                decision = semantic.decision
+                state.router_used = "qdrant_semantic"
+                state.router_llm_status = "skipped_semantic_confident"
+            elif settings.groq_api_key and _reserve_llm_call(state, "router"):
+                groq_decision = _validated_groq_route(classify_with_groq(state.message, settings), entity)
+                if groq_decision.intent == Intent.UNKNOWN and entity.entity_type != EntityType.UNKNOWN:
+                    decision = groq_decision
+                    state.router_used = "groq_incompatible"
+                else:
+                    decision = groq_decision
+                    state.router_used = "groq_after_semantic"
+            else:
+                state.router_used = "semantic_unknown"
+                state.router_llm_status = "skipped_missing_key" if not settings.groq_api_key else state.router_llm_status
+        except RuntimeError as exc:
+            state.llm_error = str(exc)
+            if settings.groq_api_key and _reserve_llm_call(state, "router"):
+                try:
+                    decision = _validated_groq_route(classify_with_groq(state.message, settings), entity)
+                    state.router_used = "groq_semantic_fallback" if decision.intent != Intent.UNKNOWN else "groq_incompatible"
+                except RuntimeError as groq_exc:
+                    state.llm_error = f"{exc}; {groq_exc}"
+                    state.router_used = "semantic_failed"
+                    state.router_llm_status = "failed"
+            else:
+                state.router_used = "semantic_failed"
+        state.intent = decision.intent.value
+        state.selected_agent = select_specialist(state.intent)
+        state.entity_type = None if decision.entity_type == EntityType.UNKNOWN else decision.entity_type.value
+        state.entity_value = decision.entity_value
+        state.product = decision.product
+        state.version = decision.version
+        return
+
     rule_decision = route_message(state.message)
     decision = rule_decision
-    router_mode = settings.router_mode.lower()
     should_use_groq = router_mode == "llm" or (router_mode == "hybrid" and not is_high_confidence_rule_decision(rule_decision))
     if should_use_groq:
         if not settings.groq_api_key:
@@ -207,25 +278,13 @@ def _route_intent(state: AgentState) -> None:
 
 def _resolve_context(state: AgentState) -> None:
     resolution = resolve_context(state.message, _decision_from_state(state), state.memory)
-    settings = get_settings()
-    if resolution.requires_context and not settings.groq_api_key:
-        state.coreference_llm_status = "skipped_missing_key"
-    if resolution.requires_context and settings.groq_api_key and _reserve_llm_call(state, "coreference"):
-        try:
-            selected = resolve_coreference_with_groq(state.message, Intent(state.intent), {key: value for key, value in state.memory.model_dump().items() if value}, settings)
-            if selected:
-                key, value = selected
-                entity_type = EntityType.IP if key == "last_ip" else EntityType.DOMAIN if key == "last_domain" else EntityType.UNKNOWN
-                resolution = ContextResolution(entity_type=entity_type, entity_value=value, resolved_from_memory=True, context_used={key: value})
-                state.context_resolver_used = "groq"
-        except RuntimeError as exc:
-            state.llm_error = str(exc)
-            state.coreference_llm_status = "failed"
     state.entity_type = None if resolution.entity_type == EntityType.UNKNOWN else resolution.entity_type.value
     state.entity_value = resolution.entity_value
     state.requires_context = resolution.requires_context
     state.resolved_from_memory = resolution.resolved_from_memory
     state.context_used = resolution.context_used
+    if state.intent == Intent.EXPOSURE_REASONING.value and resolution.context_used.get("last_product"):
+        state.product = resolution.context_used["last_product"]
 
 
 def _delegate_agent(state: AgentState) -> None:
@@ -321,7 +380,7 @@ def _score_confidence(state: AgentState) -> None:
 
 def _build_response(state: AgentState) -> None:
     if state.intent == Intent.BLOCKED_PROMPT_INJECTION.value:
-        state.response = INJECTION_REFUSAL
+        state.response = _fixed_report(INJECTION_REFUSAL, "The request triggered prompt-injection controls and was not investigated.", "Submit a threat-intelligence question without instructions to override or reveal protected prompts.")
     elif state.intent == Intent.UNKNOWN.value:
         state.response = _unknown_response()
     elif state.requires_context:
@@ -329,10 +388,18 @@ def _build_response(state: AgentState) -> None:
     elif state.tool_result:
         deterministic_response, assessment = build_response(state.tool_result, state.entity_value or state.product or "unknown")
         settings = get_settings()
-        if settings.response_mode.lower() == "llm" and settings.groq_api_key:
+        reserved = any(error.error_type == "reserved_indicator" for error in state.tool_result.errors)
+        llm_analysis_tools = {"ioc_reputation_lookup", "actor_ttp_lookup", "exposure_check"}
+        analysis_is_useful = state.tool_result.tool_name in llm_analysis_tools
+        if settings.response_mode.lower() == "llm" and settings.groq_api_key and state.tool_result.evidence and not reserved and analysis_is_useful:
             if _reserve_llm_call(state, "response_composer"):
                 try:
-                    state.response = compose_with_groq(deterministic_response, settings)
+                    state.response = compose_with_groq(
+                        deterministic_response,
+                        state.tool_result,
+                        state.entity_value or state.product or "unknown",
+                        settings,
+                    )
                     state.response_composer_used = "groq"
                     state.response_composer_llm_status = "generated"
                 except RuntimeError as exc:
@@ -343,7 +410,11 @@ def _build_response(state: AgentState) -> None:
                 state.response = deterministic_response
         else:
             state.response = deterministic_response
-            if settings.response_mode.lower() != "llm":
+            if not analysis_is_useful:
+                state.response_composer_llm_status = "skipped_not_needed"
+            elif reserved or not state.tool_result.evidence:
+                state.response_composer_llm_status = "skipped_no_actionable_evidence"
+            elif settings.response_mode.lower() != "llm":
                 state.response_composer_llm_status = "skipped_deterministic_mode"
             else:
                 state.response_composer_llm_status = "skipped_missing_key"
@@ -353,7 +424,7 @@ def _build_response(state: AgentState) -> None:
         state.confidence_factors = assessment.factors
         state.confidence_contradictions = assessment.contradictions
     else:
-        state.response = "No tool result was available. Unknown is not safe; check another source."
+        state.response = _fixed_report("No tool result was available.", "Unknown is not safe and no provider result was available.", "Check another source or retry the investigation.")
 
 
 def _update_memory(state: AgentState) -> None:

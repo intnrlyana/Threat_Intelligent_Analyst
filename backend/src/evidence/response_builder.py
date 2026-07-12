@@ -2,6 +2,7 @@
 
 from backend.src.evidence.confidence import ConfidenceAssessment, score_confidence
 from backend.src.evidence.ledger import EvidenceLedger
+from backend.src.evidence.response_policy import ACTION_CATALOGUE, DEFAULT_ACTION_IDS
 from backend.src.tools.schemas import ToolResult
 
 
@@ -14,7 +15,7 @@ def _finding(result: ToolResult, entity_value: str) -> str:
         return result.summary or f"{entity_value} is a reserved documentation/test indicator and is not actionable for external reputation analysis."
     if result.degraded and result.evidence:
         if result.tool_name == "ioc_reputation_lookup":
-            score = f" (provider detection ratio: {result.risk_score}/100)" if result.risk_score is not None else ""
+            score = f" (normalized reputation score: {result.risk_score}/100)" if result.risk_score is not None else ""
             return f"{entity_value} is assessed as {result.verdict or 'unknown'} from the available evidence{score}; one or more optional providers failed."
         return (result.summary or f"Evidence was found for {entity_value}.") + " One or more optional providers failed."
     if result.degraded:
@@ -22,7 +23,7 @@ def _finding(result: ToolResult, entity_value: str) -> str:
     if not result.success:
         return f"No available evidence was found for {entity_value}."
     if result.tool_name == "ioc_reputation_lookup":
-        score = f" (provider detection ratio: {result.risk_score}/100)" if result.risk_score is not None else ""
+        score = f" (normalized reputation score: {result.risk_score}/100)" if result.risk_score is not None else ""
         return f"{entity_value} is assessed as {result.verdict or 'unknown'} based on correlated live provider evidence{score}."
     if result.tool_name == "exposure_check":
         return result.summary or f"{entity_value} is potentially exposed based on local evidence."
@@ -58,28 +59,22 @@ def _limitations(result: ToolResult) -> list[str]:
     return limitations
 
 
-def _next_step(result: ToolResult) -> str:
-    if any(error.error_type == "reserved_indicator" for error in result.errors):
-        return "Use an observed production indicator or relevant internal telemetry for investigation."
-    if result.degraded and result.evidence:
-        if result.tool_name == "actor_ttp_lookup":
-            return "Map successful ATT&CK evidence to internal detections; separately retry or repair the failed optional provider."
-        if result.tool_name == "exposure_check":
-            return "Validate the exact deployed build and patch level; separately retry or repair the failed optional provider."
-        return "Review the successful provider evidence and internal telemetry; separately repair or retry the failed provider."
-    if result.degraded:
-        return "Retry later or check alternate threat-intelligence sources."
-    if not result.success:
-        return "Check additional sources and relevant internal telemetry before treating the indicator as safe."
-    if result.tool_name == "actor_ttp_lookup":
-        return "Map these techniques against internal detections and hunting coverage."
-    if result.tool_name == "exposure_check":
-        return "Verify the exact build and patch level, then apply the listed remediation where applicable."
-    if result.tool_name == "pivot_related_entities":
-        return "Check DNS, proxy, and endpoint telemetry for the related entities."
-    if result.tool_name == "asn_lookup":
-        return "Use this ASN information as enrichment alongside other evidence."
-    return "Review relevant internal telemetry and scope any related activity."
+def _fallback_impact(result: ToolResult) -> str:
+    return {
+        "ioc_reputation_lookup": "External reputation can prioritize investigation, but it does not establish the target's relevance to the organization or prove internal compromise.",
+        "pivot_related_entities": "The returned entities share infrastructure relationships with the target; those relationships do not establish maliciousness or current activity.",
+        "asn_lookup": "Network ownership context can support correlation and scoping, but it does not establish malicious intent or justify blocking the ASN.",
+        "actor_ttp_lookup": "The documented techniques describe historical actor behavior and can inform detection coverage; they do not establish current activity in the organization.",
+        "exposure_check": "Candidate vulnerabilities may create operational risk only when the exact product build, affected range, configuration, and deployment exposure are applicable.",
+    }.get(result.tool_name, "The available evidence requires internal context before operational impact can be concluded.")
+
+
+def _fallback_actions(result: ToolResult) -> str:
+    catalogue = ACTION_CATALOGUE.get(result.tool_name)
+    identifiers = DEFAULT_ACTION_IDS.get(result.tool_name)
+    if not catalogue or not identifiers:
+        return "- Detect: Review relevant internal telemetry.\n- Respond: Escalate only when evidence is corroborated.\n- Protect: Apply proportionate controls after validating impact."
+    return "\n".join(f"- {catalogue[action_id][0]}: {catalogue[action_id][1]}" for action_id in identifiers)
 
 
 def build_response(result: ToolResult, entity_value: str) -> tuple[str, ConfidenceAssessment]:
@@ -91,25 +86,14 @@ def build_response(result: ToolResult, entity_value: str) -> tuple[str, Confiden
     errors = [f"{error.provider} ({error.error_type}): {error.message}" for error in result.errors]
     if errors:
         evidence = f"{evidence}\n" + _bullet_list(errors, "")
-    confidence_details = confidence.label
-    if confidence.score is not None:
-        confidence_details += f" ({confidence.score}/100)"
-    confidence_details += f" - {confidence.reason}"
-    if confidence.factors:
-        confidence_details += "\nFactors:\n" + _bullet_list(
-            [f"{name.replace('_', ' ').title()}: {value:.2f}" for name, value in confidence.factors.items()],
-            "No factor details available.",
-        )
-    if confidence.contradictions:
-        confidence_details += "\nContradictions:\n" + _bullet_list(confidence.contradictions, "No contradictions detected.")
     response = "\n\n".join(
         [
             f"Finding\n{_finding(result, entity_value)}",
             f"Evidence\n{evidence}",
+            f"Impact / Risk\n{_fallback_impact(result)}",
+            f"NIST CSF-Aligned Actions\n{_fallback_actions(result)}",
             f"Sources\n{sources}",
-            f"Confidence\n{confidence_details}",
             f"Limitations\n{_bullet_list(_limitations(result), 'No additional limitations recorded.')}",
-            f"Recommended Next Step\n{_next_step(result)}",
         ]
     )
     return response, confidence

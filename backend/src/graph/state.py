@@ -49,7 +49,6 @@ class ToolTrace(BaseModel):
     router_used: str = "rule_based"
     llm_called: bool = False
     router_llm_status: str = "not_run"
-    coreference_llm_status: str = "not_needed"
     planner_llm_status: str = "not_needed"
     response_composer_llm_status: str = "not_run"
     llm_calls_made: int = 0
@@ -94,7 +93,6 @@ class AgentState(BaseModel):
     router_used: str = "rule_based"
     llm_called: bool = False
     router_llm_status: str = "not_run"
-    coreference_llm_status: str = "not_needed"
     planner_llm_status: str = "not_needed"
     response_composer_llm_status: str = "not_run"
     llm_calls_made: int = 0

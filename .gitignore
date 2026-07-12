@@ -24,3 +24,6 @@ Thumbs.db
 
 # Local fine-tuned checkpoints are reproducible but too large for normal Git.
 models/**/*.safetensors
+
+# Generated evaluation output; recreate with evals/run_evals.py.
+evals/latest_report.json

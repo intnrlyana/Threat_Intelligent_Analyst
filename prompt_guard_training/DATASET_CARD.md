@@ -15,9 +15,9 @@ This dataset contains 1,800 English prompts for adapting a binary prompt-injecti
 
 Splits are isolated by template family. The final holdout is excluded from training, calibration, and candidate selection.
 
-## Generation
+## Dataset provenance
 
-Records were generated deterministically from manually authored, application-specific templates, controlled cybersecurity entities, and eight label-neutral conversational styles. The generator uses seed `20260711`. All records are labelled synthetic (`synthetic_reviewed_templates`). No provider output, API secret, user conversation, or private production data is included.
+Records were created from manually authored, application-specific templates, controlled cybersecurity entities, and eight label-neutral conversational styles. The submitted dataset is the reviewed, fixed artifact used by the training and evaluation workflow. All records are labelled synthetic (`synthetic_reviewed_templates`). No provider output, API secret, user conversation, or private production data is included.
 
 ## Labels
 

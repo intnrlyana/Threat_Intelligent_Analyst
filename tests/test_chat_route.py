@@ -10,7 +10,7 @@ def test_chat_returns_evidence_grounded_ioc_response_and_trace() -> None:
     assert response.status_code == 200
     assert "assessed as malicious" in response.text
     assert "Finding" in response.text
-    assert "Confidence" in response.text
+    assert "evidence confidence" in response.text
     assert "ioc_lookup" in response.text
     assert "ioc_analyst" in response.text
     assert "INVESTIGATION SUMMARY" in response.text

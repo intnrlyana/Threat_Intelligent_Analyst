@@ -8,8 +8,11 @@ def test_response_has_all_required_sections() -> None:
     result = ioc_reputation_lookup(ToolRequest(entity_type="ip", entity_value="45.83.122.10"), FakeThreatIntelProvider())
     response, confidence = build_response(result, "45.83.122.10")
 
-    for section in ("Finding", "Evidence", "Sources", "Confidence", "Limitations", "Recommended Next Step"):
+    for section in ("Finding", "Evidence", "Impact / Risk", "NIST CSF-Aligned Actions", "Sources", "Limitations"):
         assert section in response
+    assert "\n\nConfidence\n" not in response
+    for prefix in ("- Detect:", "- Respond:", "- Protect:"):
+        assert prefix in response
     assert confidence.label == "High"
 
 

@@ -12,7 +12,14 @@ load_dotenv()
 class Settings(BaseModel):
     data_mode: str = Field(default="multi_provider")
     llm_provider: str = Field(default="groq")
-    router_mode: str = Field(default="hybrid")
+    router_mode: str = Field(default="semantic")
+    qdrant_url: str = Field(default="")
+    qdrant_api_key: str = Field(default="", repr=False)
+    semantic_collection_name: str = Field(default="approved_routing_examples_v3")
+    semantic_embedding_model: str = Field(default="BAAI/bge-small-en-v1.5")
+    semantic_score_threshold: float = Field(default=0.72, ge=0, le=1)
+    semantic_margin_threshold: float = Field(default=0.05, ge=0, le=1)
+    semantic_top_k: int = Field(default=5, ge=2, le=20)
     response_mode: str = Field(default="llm")
     groq_api_key: str = Field(default="", repr=False)
     llm_model: str = Field(default="llama-3.1-8b-instant")
@@ -31,6 +38,9 @@ class Settings(BaseModel):
     abuseipdb_api_key: str = Field(default="", repr=False)
     max_tool_calls_per_query: int = Field(default=3, ge=1)
     api_timeout_seconds: int = Field(default=10, ge=1)
+    api_connect_timeout_seconds: float = Field(default=3.0, gt=0)
+    api_write_timeout_seconds: float = Field(default=5.0, gt=0)
+    api_pool_timeout_seconds: float = Field(default=3.0, gt=0)
     provider_cache_ttl_seconds: int = Field(default=300, ge=1)
     provider_cache_max_entries: int = Field(default=256, ge=1)
     provider_max_workers: int = Field(default=3, ge=1, le=10)
@@ -42,7 +52,14 @@ def get_settings() -> Settings:
     return Settings(
         data_mode=os.getenv("DATA_MODE", "multi_provider"),
         llm_provider=os.getenv("LLM_PROVIDER", "groq"),
-        router_mode=os.getenv("ROUTER_MODE", "hybrid"),
+        router_mode=os.getenv("ROUTER_MODE", "semantic"),
+        qdrant_url=os.getenv("QDRANT_URL", ""),
+        qdrant_api_key=os.getenv("QDRANT_API_KEY", ""),
+        semantic_collection_name=os.getenv("SEMANTIC_COLLECTION_NAME", "approved_routing_examples_v3"),
+        semantic_embedding_model=os.getenv("SEMANTIC_EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5"),
+        semantic_score_threshold=float(os.getenv("SEMANTIC_SCORE_THRESHOLD", "0.72")),
+        semantic_margin_threshold=float(os.getenv("SEMANTIC_MARGIN_THRESHOLD", "0.05")),
+        semantic_top_k=int(os.getenv("SEMANTIC_TOP_K", "5")),
         response_mode=os.getenv("RESPONSE_MODE", "llm"),
         groq_api_key=os.getenv("GROQ_API_KEY", ""),
         llm_model=os.getenv("LLM_MODEL", "llama-3.1-8b-instant"),
@@ -61,6 +78,9 @@ def get_settings() -> Settings:
         abuseipdb_api_key=os.getenv("ABUSEIPDB_API_KEY", ""),
         max_tool_calls_per_query=int(os.getenv("MAX_TOOL_CALLS_PER_QUERY", "3")),
         api_timeout_seconds=int(os.getenv("API_TIMEOUT_SECONDS", "10")),
+        api_connect_timeout_seconds=float(os.getenv("API_CONNECT_TIMEOUT_SECONDS", "3")),
+        api_write_timeout_seconds=float(os.getenv("API_WRITE_TIMEOUT_SECONDS", "5")),
+        api_pool_timeout_seconds=float(os.getenv("API_POOL_TIMEOUT_SECONDS", "3")),
         provider_cache_ttl_seconds=int(os.getenv("PROVIDER_CACHE_TTL_SECONDS", "300")),
         provider_cache_max_entries=int(os.getenv("PROVIDER_CACHE_MAX_ENTRIES", "256")),
         provider_max_workers=int(os.getenv("PROVIDER_MAX_WORKERS", "3")),

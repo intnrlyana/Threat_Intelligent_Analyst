@@ -19,7 +19,7 @@ class OTXProvider:
             return None
         if not self.settings.alien_vault_api_key:
             return error("AlienVault OTX", "configuration", "ALIEN_VAULT_API_KEY is not configured.")
-        payload = get_json(provider="AlienVault OTX", url=f"https://otx.alienvault.com/api/v1/indicators/{indicator_type}/{quote(value, safe='')}/general", timeout=self.settings.api_timeout_seconds, headers={"X-OTX-API-KEY": self.settings.alien_vault_api_key})
+        payload = get_json(provider="AlienVault OTX", url=f"https://otx.alienvault.com/api/v1/indicators/{indicator_type}/{quote(value, safe='')}/general", timeout=self.settings.api_timeout_seconds, connect_timeout=self.settings.api_connect_timeout_seconds, write_timeout=self.settings.api_write_timeout_seconds, pool_timeout=self.settings.api_pool_timeout_seconds, headers={"X-OTX-API-KEY": self.settings.alien_vault_api_key})
         if payload is None or isinstance(payload, ProviderFailure):
             return payload
         pulse_info = payload.get("pulse_info", {})
@@ -34,7 +34,7 @@ class OTXProvider:
     def lookup_actor(self, actor: str) -> ProviderResult:
         if not self.settings.alien_vault_api_key:
             return error("AlienVault OTX", "configuration", "ALIEN_VAULT_API_KEY is not configured.")
-        payload = get_json(provider="AlienVault OTX", url="https://otx.alienvault.com/api/v1/search/pulses", timeout=self.settings.api_timeout_seconds, headers={"X-OTX-API-KEY": self.settings.alien_vault_api_key}, params={"q": actor, "limit": 10})
+        payload = get_json(provider="AlienVault OTX", url="https://otx.alienvault.com/api/v1/search/pulses", timeout=self.settings.api_timeout_seconds, connect_timeout=self.settings.api_connect_timeout_seconds, write_timeout=self.settings.api_write_timeout_seconds, pool_timeout=self.settings.api_pool_timeout_seconds, headers={"X-OTX-API-KEY": self.settings.alien_vault_api_key}, params={"q": actor, "limit": 10})
         if payload is None or isinstance(payload, ProviderFailure):
             return payload
         results = payload.get("results", [])

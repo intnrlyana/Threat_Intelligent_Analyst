@@ -23,7 +23,7 @@ class NVDProvider:
     def lookup_exposure(self, product: str, version: str) -> ProviderResult:
         if not self.settings.nvd_api_key:
             return error("NVD", "configuration", "NVD_API_KEY is not configured.")
-        payload = get_json(provider="NVD", url="https://services.nvd.nist.gov/rest/json/cves/2.0", timeout=self.settings.api_timeout_seconds, headers={"apiKey": self.settings.nvd_api_key}, params={"keywordSearch": f"{product} {version}", "resultsPerPage": 10})
+        payload = get_json(provider="NVD", url="https://services.nvd.nist.gov/rest/json/cves/2.0", timeout=self.settings.api_timeout_seconds, connect_timeout=self.settings.api_connect_timeout_seconds, write_timeout=self.settings.api_write_timeout_seconds, pool_timeout=self.settings.api_pool_timeout_seconds, headers={"apiKey": self.settings.nvd_api_key}, params={"keywordSearch": f"{product} {version}", "resultsPerPage": 10})
         if payload is None or isinstance(payload, ProviderFailure):
             return payload
         vulnerabilities = []

@@ -1,0 +1,72 @@
+{"text":"Is this IP address malicious or suspicious?","intent":"ioc_lookup","family":"reputation_assessment","style":"direct","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Check the external reputation of this domain.","intent":"ioc_lookup","family":"reputation_assessment","style":"formal","entity_types":["domain"],"approved":true,"dataset_version":3}
+{"text":"Investigate this file hash with threat intelligence.","intent":"ioc_lookup","family":"hash_reputation","style":"direct","entity_types":["hash"],"approved":true,"dataset_version":3}
+{"text":"Have security vendors flagged this indicator?","intent":"ioc_lookup","family":"provider_detections","style":"conversational","entity_types":["ip","domain","hash"],"approved":true,"dataset_version":3}
+{"text":"Does this destination have a bad reputation?","intent":"ioc_lookup","family":"reputation_assessment","style":"soc","entity_types":["ip","domain"],"approved":true,"dataset_version":3}
+{"text":"Run an IOC reputation check on this value.","intent":"ioc_lookup","family":"reputation_assessment","style":"soc","entity_types":["ip","domain","hash"],"approved":true,"dataset_version":3}
+{"text":"What do intelligence providers report about this address?","intent":"ioc_lookup","family":"provider_detections","style":"formal","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Is this domain known for malicious activity?","intent":"ioc_lookup","family":"domain_reputation","style":"direct","entity_types":["domain"],"approved":true,"dataset_version":3}
+{"text":"Look up detections for this SHA-256.","intent":"ioc_lookup","family":"hash_reputation","style":"soc","entity_types":["hash"],"approved":true,"dataset_version":3}
+{"text":"Was this network destination previously reported as harmful?","intent":"ioc_lookup","family":"reputation_assessment","style":"incident_response","entity_types":["ip","domain"],"approved":true,"dataset_version":3}
+{"text":"Reputation check for the supplied observable.","intent":"ioc_lookup","family":"reputation_assessment","style":"shorthand","entity_types":["ip","domain","hash"],"approved":true,"dataset_version":3}
+{"text":"Correlate this IOC across external intelligence sources.","intent":"ioc_lookup","family":"provider_detections","style":"formal","entity_types":["ip","domain","hash"],"approved":true,"dataset_version":3}
+{"text":"Find domains related to this IP address.","intent":"pivot","family":"related_domains","style":"direct","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Pivot from this infrastructure to connected hosts.","intent":"pivot","family":"infrastructure_graph","style":"soc","entity_types":["ip","domain"],"approved":true,"dataset_version":3}
+{"text":"What else has resolved to this address?","intent":"pivot","family":"passive_dns","style":"conversational","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Show passive DNS relationships for that target.","intent":"pivot","family":"passive_dns","style":"formal","entity_types":["ip","domain"],"approved":true,"dataset_version":3}
+{"text":"Map the infrastructure around this indicator.","intent":"pivot","family":"infrastructure_graph","style":"soc","entity_types":["ip","domain"],"approved":true,"dataset_version":3}
+{"text":"Which domains share resolution history with this host?","intent":"pivot","family":"related_domains","style":"formal","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Trace connected infrastructure from that address.","intent":"pivot","family":"contextual_pivot","style":"follow_up","entity_types":["ip","unknown"],"approved":true,"dataset_version":3}
+{"text":"What other hosts are associated with this domain?","intent":"pivot","family":"infrastructure_graph","style":"conversational","entity_types":["domain"],"approved":true,"dataset_version":3}
+{"text":"Expand this observable into related infrastructure.","intent":"pivot","family":"infrastructure_graph","style":"soc","entity_types":["ip","domain"],"approved":true,"dataset_version":3}
+{"text":"Follow the DNS links from this IP.","intent":"pivot","family":"passive_dns","style":"shorthand","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Identify infrastructure relationships for the target.","intent":"pivot","family":"infrastructure_graph","style":"formal","entity_types":["ip","domain"],"approved":true,"dataset_version":3}
+{"text":"What is connected to it?","intent":"pivot","family":"contextual_pivot","style":"follow_up","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Who owns the network for this IP?","intent":"asn_lookup","family":"network_ownership","style":"conversational","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"What ASN announces this address?","intent":"asn_lookup","family":"asn_identity","style":"direct","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Give me autonomous system enrichment for this IP.","intent":"asn_lookup","family":"asn_enrichment","style":"formal","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Which network and organization announce this address?","intent":"asn_lookup","family":"network_ownership","style":"formal","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Who operates that host's network?","intent":"asn_lookup","family":"network_ownership","style":"follow_up","entity_types":["ip","unknown"],"approved":true,"dataset_version":3}
+{"text":"Enrich this address with ASN details.","intent":"asn_lookup","family":"asn_enrichment","style":"soc","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Which autonomous system contains this destination?","intent":"asn_lookup","family":"asn_identity","style":"incident_response","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Give me the network owner and ASN.","intent":"asn_lookup","family":"network_ownership","style":"shorthand","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"What organization operates that IP?","intent":"asn_lookup","family":"network_ownership","style":"follow_up","entity_types":["ip","unknown"],"approved":true,"dataset_version":3}
+{"text":"Resolve this IP to its autonomous system.","intent":"asn_lookup","family":"asn_identity","style":"formal","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Provide BGP ownership context for this address.","intent":"asn_lookup","family":"network_ownership","style":"technical","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"Which provider announces this IP range?","intent":"asn_lookup","family":"network_ownership","style":"conversational","entity_types":["ip"],"approved":true,"dataset_version":3}
+{"text":"What techniques is this threat actor known for?","intent":"actor_ttp","family":"actor_techniques","style":"direct","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"Show the MITRE ATT&CK TTPs for this APT group.","intent":"actor_ttp","family":"attack_mapping","style":"formal","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"How does this adversary operate?","intent":"actor_ttp","family":"actor_behavior","style":"conversational","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"List documented techniques associated with the actor.","intent":"actor_ttp","family":"actor_techniques","style":"formal","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"Which credential access methods has this group used?","intent":"actor_ttp","family":"tactic_specific","style":"technical","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"Map this threat group against MITRE ATT&CK.","intent":"actor_ttp","family":"attack_mapping","style":"soc","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"Give me the documented behavior of this APT actor.","intent":"actor_ttp","family":"actor_behavior","style":"formal","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"What persistence techniques are linked to this adversary?","intent":"actor_ttp","family":"tactic_specific","style":"technical","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"How has this APT group historically operated?","intent":"actor_ttp","family":"actor_behavior","style":"incident_response","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"Show known procedures for this threat actor.","intent":"actor_ttp","family":"actor_techniques","style":"soc","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"Which ATT&CK techniques should we map for this actor?","intent":"actor_ttp","family":"attack_mapping","style":"defensive","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"Summarize the actor's known TTP profile.","intent":"actor_ttp","family":"actor_behavior","style":"shorthand","entity_types":["actor"],"approved":true,"dataset_version":3}
+{"text":"Is this software version exposed to known CVEs?","intent":"exposure_reasoning","family":"version_exposure","style":"direct","entity_types":["product","version"],"approved":true,"dataset_version":3}
+{"text":"We run this product version; are we vulnerable?","intent":"exposure_reasoning","family":"deployment_exposure","style":"conversational","entity_types":["product"],"approved":true,"dataset_version":3}
+{"text":"Assess vulnerability exposure for the deployed build.","intent":"exposure_reasoning","family":"deployment_exposure","style":"formal","entity_types":["product","version"],"approved":true,"dataset_version":3}
+{"text":"Which CVEs may apply to this product and version?","intent":"exposure_reasoning","family":"cve_candidates","style":"direct","entity_types":["product","version"],"approved":true,"dataset_version":3}
+{"text":"Does NVD list issues for this software release?","intent":"exposure_reasoning","family":"nvd_search","style":"formal","entity_types":["product","version"],"approved":true,"dataset_version":3}
+{"text":"Check whether this deployed application is affected by known vulnerabilities.","intent":"exposure_reasoning","family":"deployment_exposure","style":"incident_response","entity_types":["product"],"approved":true,"dataset_version":3}
+{"text":"Find security advisories relevant to this product build.","intent":"exposure_reasoning","family":"cve_candidates","style":"formal","entity_types":["product","version"],"approved":true,"dataset_version":3}
+{"text":"Are there known flaws in this exact release?","intent":"exposure_reasoning","family":"version_exposure","style":"conversational","entity_types":["product","version"],"approved":true,"dataset_version":3}
+{"text":"Evaluate this version against the vulnerability catalogue.","intent":"exposure_reasoning","family":"nvd_search","style":"technical","entity_types":["product","version"],"approved":true,"dataset_version":3}
+{"text":"What about version 7.13.8 of that product?","intent":"exposure_reasoning","family":"version_follow_up","style":"follow_up","entity_types":["version","unknown"],"approved":true,"dataset_version":3}
+{"text":"Check that software at the newer patch version.","intent":"exposure_reasoning","family":"version_follow_up","style":"follow_up","entity_types":["version","unknown"],"approved":true,"dataset_version":3}
+{"text":"Could this application build be vulnerable?","intent":"exposure_reasoning","family":"version_exposure","style":"conversational","entity_types":["product","version"],"approved":true,"dataset_version":3}
+{"text":"What is tomorrow's weather forecast?","intent":"unknown","family":"weather","style":"direct","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Write a poem about a summer holiday.","intent":"unknown","family":"creative_writing","style":"direct","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Help me plan dinner for this evening.","intent":"unknown","family":"personal_planning","style":"conversational","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Who won the football match?","intent":"unknown","family":"sports","style":"direct","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Create a Python sorting function.","intent":"unknown","family":"general_coding","style":"direct","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Translate this paragraph into another language.","intent":"unknown","family":"translation","style":"direct","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Summarize today's stock market.","intent":"unknown","family":"finance","style":"direct","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Book a meeting for tomorrow.","intent":"unknown","family":"calendar","style":"direct","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Explain how ransomware works.","intent":"unknown","family":"security_education","style":"educational","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"How should a SOC detect PowerShell abuse?","intent":"unknown","family":"general_defense","style":"defensive","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"What is the NVD?","intent":"unknown","family":"security_education","style":"educational","entity_types":["unknown"],"approved":true,"dataset_version":3}
+{"text":"Explain credential dumping to a new analyst.","intent":"unknown","family":"security_education","style":"educational","entity_types":["unknown"],"approved":true,"dataset_version":3}

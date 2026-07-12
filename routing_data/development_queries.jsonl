@@ -1,0 +1,30 @@
+{"text":"Has 203.0.113.44 been flagged by reputation services?","expected_intent":"ioc_lookup","family":"dev_ioc_provider"}
+{"text":"Check whether sample-threat.example has negative intelligence.","expected_intent":"ioc_lookup","family":"dev_ioc_domain"}
+{"text":"What is known about this MD5 observable?","expected_intent":"ioc_lookup","family":"dev_ioc_hash"}
+{"text":"Assess the reputation of this destination.","expected_intent":"ioc_lookup","family":"dev_ioc_destination"}
+{"text":"Do external sources consider this indicator suspicious?","expected_intent":"ioc_lookup","family":"dev_ioc_sources"}
+{"text":"Discover domains sharing infrastructure with this address.","expected_intent":"pivot","family":"dev_pivot_domains"}
+{"text":"Build an infrastructure graph from this host.","expected_intent":"pivot","family":"dev_pivot_graph"}
+{"text":"Show historical resolutions connected to the target.","expected_intent":"pivot","family":"dev_pivot_dns"}
+{"text":"Expand from that domain into related assets.","expected_intent":"pivot","family":"dev_pivot_followup"}
+{"text":"What other infrastructure is linked to it?","expected_intent":"pivot","family":"dev_pivot_context"}
+{"text":"Identify the autonomous system behind this destination.","expected_intent":"asn_lookup","family":"dev_asn_identity"}
+{"text":"Who is the network operator for this address?","expected_intent":"asn_lookup","family":"dev_asn_owner"}
+{"text":"Add BGP and ASN context to this IP.","expected_intent":"asn_lookup","family":"dev_asn_bgp"}
+{"text":"Which organization announces that address?","expected_intent":"asn_lookup","family":"dev_asn_followup"}
+{"text":"Resolve the destination to its network owner.","expected_intent":"asn_lookup","family":"dev_asn_network"}
+{"text":"Describe the ATT&CK profile for APT18.","expected_intent":"actor_ttp","family":"dev_actor_attack"}
+{"text":"Which behaviors have been observed for APT32?","expected_intent":"actor_ttp","family":"dev_actor_behavior"}
+{"text":"Show APT40's documented methods.","expected_intent":"actor_ttp","family":"dev_actor_methods"}
+{"text":"What discovery techniques has APT29 used?","expected_intent":"actor_ttp","family":"dev_actor_tactic"}
+{"text":"Summarize known adversary procedures for APT28.","expected_intent":"actor_ttp","family":"dev_actor_procedures"}
+{"text":"Check Drupal 10.1 against known vulnerability records.","expected_intent":"exposure_reasoning","family":"dev_exposure_product"}
+{"text":"Could Kubernetes 1.27 be affected by published CVEs?","expected_intent":"exposure_reasoning","family":"dev_exposure_cve"}
+{"text":"Search NVD for issues matching Grafana 10.0.","expected_intent":"exposure_reasoning","family":"dev_exposure_nvd"}
+{"text":"Evaluate the deployed Redis 7.0 release for exposure.","expected_intent":"exposure_reasoning","family":"dev_exposure_deployment"}
+{"text":"What about patch 8.5.3 for the product we discussed?","expected_intent":"exposure_reasoning","family":"dev_exposure_followup"}
+{"text":"Draft a project status update.","expected_intent":"unknown","family":"dev_unknown_writing"}
+{"text":"Convert 100 USD to EUR.","expected_intent":"unknown","family":"dev_unknown_finance"}
+{"text":"Explain what a firewall does.","expected_intent":"unknown","family":"dev_unknown_education"}
+{"text":"Find a restaurant near the airport.","expected_intent":"unknown","family":"dev_unknown_travel"}
+{"text":"Generate a unit test for a calculator.","expected_intent":"unknown","family":"dev_unknown_code"}

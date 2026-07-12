@@ -11,6 +11,7 @@ HASH_PATTERN = re.compile(r"\b(?:[a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}
 ACTOR_PATTERN = re.compile(r"\bAPT\s?(\d{1,4})\b", re.IGNORECASE)
 ASN_PATTERN = re.compile(r"\bAS\d{1,10}\b", re.IGNORECASE)
 PRODUCT_VERSION_PATTERN = re.compile(r"\b([A-Za-z][A-Za-z0-9_-]*)\s+(\d+(?:\.\d+){1,3})\b")
+STANDALONE_VERSION_PATTERN = re.compile(r"^\s*(\d+(?:\.\d+){2,3})\s*$")
 
 IOC_WORDS = ("malicious", "suspicious", "reputation", "check", "investigate")
 ACTOR_WORDS = ("ttp", "ttps", "technique", "techniques")
@@ -55,6 +56,33 @@ def _product_and_version(message: str) -> tuple[str | None, str | None]:
     return None, None
 
 
+def extract_entities(message: str) -> RoutingDecision:
+    """Extract validated entities without assigning an investigation intent."""
+    ip = _first_ip(message)
+    domain = _first_domain(message)
+    hash_value = HASH_PATTERN.search(message)
+    actor = ACTOR_PATTERN.search(message)
+    asn = ASN_PATTERN.search(message)
+    product, version = _product_and_version(message)
+    standalone_version = STANDALONE_VERSION_PATTERN.fullmatch(message)
+    if hash_value:
+        return RoutingDecision(intent=Intent.UNKNOWN, entity_type=EntityType.HASH, entity_value=hash_value.group(0).lower())
+    if ip:
+        return RoutingDecision(intent=Intent.UNKNOWN, entity_type=EntityType.IP, entity_value=ip)
+    if actor:
+        return RoutingDecision(intent=Intent.UNKNOWN, entity_type=EntityType.ACTOR, entity_value=f"APT{actor.group(1)}")
+    if product and version and product.lower() not in {"is", "are", "and", "the", "this"}:
+        return RoutingDecision(intent=Intent.UNKNOWN, entity_type=EntityType.PRODUCT, entity_value=product, product=product, version=version)
+    if standalone_version:
+        version = standalone_version.group(1)
+        return RoutingDecision(intent=Intent.UNKNOWN, entity_type=EntityType.VERSION, entity_value=version, version=version)
+    if asn:
+        return RoutingDecision(intent=Intent.UNKNOWN, entity_type=EntityType.ASN, entity_value=asn.group(0).upper())
+    if domain:
+        return RoutingDecision(intent=Intent.UNKNOWN, entity_type=EntityType.DOMAIN, entity_value=domain)
+    return RoutingDecision(intent=Intent.UNKNOWN)
+
+
 def route_message(message: str) -> RoutingDecision:
     """Classify an analyst message with transparent local rules."""
     normalized = message.lower()
@@ -64,6 +92,7 @@ def route_message(message: str) -> RoutingDecision:
     actor = ACTOR_PATTERN.search(message)
     asn = ASN_PATTERN.search(message)
     product, version = _product_and_version(message)
+    standalone_version = STANDALONE_VERSION_PATTERN.fullmatch(message)
 
     if any(word in normalized for word in ASN_WORDS):
         return RoutingDecision(
@@ -85,6 +114,15 @@ def route_message(message: str) -> RoutingDecision:
             entity_value=product,
             product=product,
             version=version,
+        )
+    if standalone_version:
+        version = standalone_version.group(1)
+        return RoutingDecision(
+            intent=Intent.EXPOSURE_REASONING,
+            entity_type=EntityType.VERSION,
+            entity_value=version,
+            version=version,
+            requires_context=True,
         )
     if actor or any(word in normalized for word in ACTOR_WORDS):
         return RoutingDecision(

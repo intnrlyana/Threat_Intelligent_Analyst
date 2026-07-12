@@ -1,0 +1,30 @@
+{"text":"Do threat feeds recognize 198.51.100.24 as risky?","expected_intent":"ioc_lookup","family":"final_ioc_feed"}
+{"text":"Investigate the standing of final-check.example.","expected_intent":"ioc_lookup","family":"final_ioc_domain"}
+{"text":"Is this SHA-1 associated with harmful activity?","expected_intent":"ioc_lookup","family":"final_ioc_hash"}
+{"text":"Correlate reputation findings for the observable.","expected_intent":"ioc_lookup","family":"final_ioc_correlation"}
+{"text":"Was this endpoint reported by intelligence vendors?","expected_intent":"ioc_lookup","family":"final_ioc_vendor"}
+{"text":"Enumerate hostnames historically tied to this IP.","expected_intent":"pivot","family":"final_pivot_hostnames"}
+{"text":"Explore neighboring infrastructure for the domain.","expected_intent":"pivot","family":"final_pivot_neighbor"}
+{"text":"Follow resolution links outward from the target.","expected_intent":"pivot","family":"final_pivot_links"}
+{"text":"Which assets appear in the same infrastructure graph?","expected_intent":"pivot","family":"final_pivot_graph"}
+{"text":"Continue mapping from that observable.","expected_intent":"pivot","family":"final_pivot_context"}
+{"text":"Determine the ASN responsible for this destination.","expected_intent":"asn_lookup","family":"final_asn_responsible"}
+{"text":"Which carrier owns this IP space?","expected_intent":"asn_lookup","family":"final_asn_carrier"}
+{"text":"Provide autonomous system ownership for the host.","expected_intent":"asn_lookup","family":"final_asn_ownership"}
+{"text":"Who announces that destination on the internet?","expected_intent":"asn_lookup","family":"final_asn_announce"}
+{"text":"Add network operator context to this address.","expected_intent":"asn_lookup","family":"final_asn_operator"}
+{"text":"What is the known operational playbook for APT35?","expected_intent":"actor_ttp","family":"final_actor_playbook"}
+{"text":"Which ATT&CK behaviors are attributed to APT39?","expected_intent":"actor_ttp","family":"final_actor_behaviors"}
+{"text":"Describe how APT34 has historically gained access.","expected_intent":"actor_ttp","family":"final_actor_access"}
+{"text":"List collection methods documented for APT29.","expected_intent":"actor_ttp","family":"final_actor_collection"}
+{"text":"Build a technique profile for APT41.","expected_intent":"actor_ttp","family":"final_actor_profile"}
+{"text":"Review Elasticsearch 8.9 for published vulnerability candidates.","expected_intent":"exposure_reasoning","family":"final_exposure_candidates"}
+{"text":"Could OpenSSL 3.0.8 match known security issues?","expected_intent":"exposure_reasoning","family":"final_exposure_match"}
+{"text":"Assess exposure for the installed RabbitMQ 3.12 release.","expected_intent":"exposure_reasoning","family":"final_exposure_installed"}
+{"text":"Search the vulnerability catalogue for Keycloak 22.0.","expected_intent":"exposure_reasoning","family":"final_exposure_catalog"}
+{"text":"Recheck the same product at version 9.1.4.","expected_intent":"exposure_reasoning","family":"final_exposure_followup"}
+{"text":"Compose a birthday greeting.","expected_intent":"unknown","family":"final_unknown_writing"}
+{"text":"Calculate the area of a circle.","expected_intent":"unknown","family":"final_unknown_math"}
+{"text":"Explain the history of cryptography.","expected_intent":"unknown","family":"final_unknown_education"}
+{"text":"Recommend a laptop for video editing.","expected_intent":"unknown","family":"final_unknown_product"}
+{"text":"Create a weekly exercise plan.","expected_intent":"unknown","family":"final_unknown_health"}

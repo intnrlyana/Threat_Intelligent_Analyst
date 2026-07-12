@@ -15,7 +15,7 @@ class AbuseIPDBProvider:
             return None
         if not self.settings.abuseipdb_api_key:
             return error("AbuseIPDB", "configuration", "ABUSEIPDB_API_KEY is not configured.")
-        payload = get_json(provider="AbuseIPDB", url="https://api.abuseipdb.com/api/v2/check", timeout=self.settings.api_timeout_seconds, headers={"Key": self.settings.abuseipdb_api_key, "Accept": "application/json"}, params={"ipAddress": value, "maxAgeInDays": 90, "verbose": ""})
+        payload = get_json(provider="AbuseIPDB", url="https://api.abuseipdb.com/api/v2/check", timeout=self.settings.api_timeout_seconds, connect_timeout=self.settings.api_connect_timeout_seconds, write_timeout=self.settings.api_write_timeout_seconds, pool_timeout=self.settings.api_pool_timeout_seconds, headers={"Key": self.settings.abuseipdb_api_key, "Accept": "application/json"}, params={"ipAddress": value, "maxAgeInDays": 90, "verbose": ""})
         if payload is None or isinstance(payload, ProviderFailure):
             return payload
         data = payload.get("data", {})

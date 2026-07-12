@@ -34,6 +34,15 @@ def _valid_explicit_entity(decision: RoutingDecision) -> bool:
 
 def resolve_context(message: str, decision: RoutingDecision, memory: AgentMemory) -> ContextResolution:
     """Resolve constrained follow-up references from the current session memory."""
+    if decision.intent == Intent.EXPOSURE_REASONING and decision.entity_type == EntityType.VERSION:
+        if memory.last_product:
+            return ContextResolution(
+                entity_type=EntityType.PRODUCT,
+                entity_value=memory.last_product,
+                resolved_from_memory=True,
+                context_used={"last_product": memory.last_product},
+            )
+        return ContextResolution(requires_context=True)
     if _valid_explicit_entity(decision):
         return ContextResolution(entity_type=decision.entity_type, entity_value=decision.entity_value)
 
@@ -56,6 +65,16 @@ def resolve_context(message: str, decision: RoutingDecision, memory: AgentMemory
                 entity_value=memory.last_domain,
                 resolved_from_memory=True,
                 context_used={"last_domain": memory.last_domain},
+            )
+        compatible = [(EntityType.IP, "last_ip", memory.last_ip), (EntityType.DOMAIN, "last_domain", memory.last_domain)]
+        available = [(entity_type, key, value) for entity_type, key, value in compatible if value]
+        if len(available) == 1:
+            entity_type, key, value = available[0]
+            return ContextResolution(
+                entity_type=entity_type,
+                entity_value=value,
+                resolved_from_memory=True,
+                context_used={key: value},
             )
         if references_ip and memory.last_ip:
             return ContextResolution(
@@ -88,6 +107,8 @@ def update_memory(memory: AgentMemory, decision: RoutingDecision, resolution: Co
         updated.last_hash = resolution.entity_value
     elif entity_type == EntityType.ACTOR and resolution.entity_value:
         updated.last_actor = resolution.entity_value
+    elif entity_type == EntityType.VERSION and resolution.entity_value:
+        updated.last_version = resolution.entity_value
     elif entity_type == EntityType.ASN and resolution.entity_value:
         updated.last_asn = resolution.entity_value
     if decision.product:
