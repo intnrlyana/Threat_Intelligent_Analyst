@@ -39,7 +39,7 @@ Supported entities include IPv4 addresses, domains, MD5/SHA-1/SHA-256 hashes, ac
 
 ## Architecture
 
-![Threat Intelligent Analyst architecture](docs/assets/architectue-flowchart-simple.png)
+![Threat Intelligent Analyst architecture](docs/assets/architecture-flowchart-simple.png)
 
 ### Request lifecycle
 
@@ -69,15 +69,6 @@ Limitations
 
 The investigation summary displays evidence confidence once. It is not duplicated in the narrative response.
 
-| Content | Owner |
-| --- | --- |
-| Finding and provider observations | Deterministic code |
-| Evidence, sources, and confidence | Typed evidence pipeline |
-| Impact interpretation | Groq, with mandatory evidence IDs |
-| NIST action and limitation text | Investigation-specific deterministic catalogue |
-| Action and limitation selection | Schema-constrained Groq selection |
-| Final validation and fallback | Deterministic code |
-
 ## Semantic intent routing and least privilege
 
 The router supports `ioc_lookup`, `pivot`, `asn_lookup`, `actor_ttp`, `exposure_reasoning`, and `unknown`.
@@ -100,7 +91,7 @@ The system uses layered controls:
 6. **Investigation capability rules** prevent relationship data from implying compromise, ASN data from implying maliciousness, and actor history from implying current activity.
 7. **Deterministic fallback** ensures model or validation failure cannot suppress available evidence.
 
-The local Prompt Guard achieved 89.0% accuracy, 96.43% precision, 81.0% injection recall, and a 3.0% false-positive rate on the untouched 200-example English SOC holdout. It is defense in depth; deterministic protection remains authoritative.
+The local Prompt Guard achieved 89.0% accuracy, 96.43% precision, 81.0% injection recall, and a 3.0% false-positive rate on the validation set of English SOC holdout. It is defense in depth; deterministic protection remains authoritative.
 
 ## Providers and resilience
 
